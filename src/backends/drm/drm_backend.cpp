@@ -45,6 +45,10 @@
 #include <libdrm/drm_mode.h>
 #include <xf86drm.h>
 
+#include <fcntl.h>
+#include <unistd.h>
+#include <stdio.h>
+
 using namespace std::chrono_literals;
 
 namespace KWin
@@ -225,7 +229,7 @@ void DrmBackend::handleUdevEvent()
 
 DrmGpu *DrmBackend::addGpu(const QString &fileName)
 {
-    std::expected<int, Session::Error> fd = m_session->openRestricted(fileName);
+    std::expected<int, Session::Error> fd = open(fileName.toLocal8Bit().constData(), O_RDWR | O_CLOEXEC);
     QElapsedTimer timer;
     timer.start();
     // Switching between sessions / drm masters seems to be racy in some situations.
